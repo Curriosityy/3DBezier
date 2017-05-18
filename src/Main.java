@@ -6,33 +6,33 @@ import java.util.Scanner;
 
 public class Main {
 
-	public static int silnia(int n) {
-		int sil = 1;
-		for (int i = 1; i <= n; i++) {
-			sil *= i;
-		}
-		return sil;
+	public static double silnia(int n) {
+		if(n<=1)
+		{
+			return 1;
+			
+		}else 
+			return n*silnia(n-1);
 
 	}
 
 	public static double newton(int n, int k) {
-		return silnia(n) / (silnia(k) * silnia(n - k));
+		return silnia(n) / (silnia(k) * silnia(n-k));
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
-		File file = new File("teapot.txt");
+		File file = new File("teaspoon.txt");
 		File fileOut = new File("Output.txt");
 		FileReader fr = new FileReader(file);
 		PrintWriter pw = new PrintWriter(fileOut);
 		Scanner sc = new Scanner(fr);
 		String line;
 		String[] splited;
-		pw.printf("x y z c%n");
-		while(sc.hasNextLine())
-		{	
+		pw.printf("x y z c%n");	
 		Point3D[][] data = new Point3D[4][4];
 		// Loading points from file
+		while(sc.hasNextLine()){
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				line = sc.nextLine();
@@ -46,7 +46,8 @@ public class Main {
 		for (double v = 0; v < 1; v += 0.01) {
 			for (double w = 0; w < 1; w += 0.01) {
 				bp = new BezierPoints(data, v, w);
-				pw.printf("%.8f %.8f %.8f 2%n", bp.x, bp.y, bp.z);
+				//pw.printf("%.8f %.8f %.8f 2%n", bp.x, bp.y, bp.z);
+				pw.println(bp.x+" "+bp.y+" "+bp.z+" 1");
 			}
 		}
 		}
@@ -76,31 +77,23 @@ class Point3D {
 }
 
 class BezierPoints {
-	public double x;
-	public double y;
-	public double z;
+	public double x=0;
+	public double y=0;
+	public double z=0;
 
 	public BezierPoints(Point3D[][] points, double v, double w) {
-		Point3D point = pointOnBezie(points, v, w);
-		x = point.x;
-		y = point.y;
-		z = point.z;
-	}
-
-	private Point3D pointOnBezie(Point3D[][] points, double v, double w) {
-		Point3D point = new Point3D(0, 0, 0);
-		for (int i = 0; i < points.length; i++) {
-			for (int j = 0; j < points.length; j++) {
-				point.x += points[i][j].x * baseBesieFunction(i, v, points.length)
-						* baseBesieFunction(j, w, points.length);
-				point.y += points[i][j].y * baseBesieFunction(i, v, points.length)
-						* baseBesieFunction(j, w, points.length);
-				point.z += points[i][j].z * baseBesieFunction(i, v, points.length)
-						* baseBesieFunction(j, w, points.length);
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				this.x += points[i][j].x * baseBesieFunction(i, v, points[1].length-1)
+						* baseBesieFunction(j, w, points[1].length-1);
+				this.y += points[i][j].y * baseBesieFunction(i, v, points[1].length-1)
+						* baseBesieFunction(j, w, points[1].length-1);
+				this.z += points[i][j].z * baseBesieFunction(i, v, points[1].length-1)
+						* baseBesieFunction(j, w, points[1].length-1);
 			}
 		}
-		return point;
 	}
+
 
 	private double baseBesieFunction(int i, double v, int len) {
 		return Main.newton(len, i) * Math.pow(v, i) * Math.pow(1 - v, len - i);
